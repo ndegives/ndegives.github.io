@@ -10,33 +10,56 @@ body {
 }
 
 header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #333;
     color: #fff;
-    padding: 1rem;
+    padding: 10px;
+}
+
+.header-left {
+    text-align: left;
 }
 
 header h1 {
     font-size: 2rem;
 }
 
-nav ul {
+.navbar {
+    text-align: right;
+}
+
+.navbar ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
 }
 
-nav ul li {
+.navbar li {
+    margin-left: 20px;
+}
+
+.navbar li a {
     display: inline-block;
-    margin-right: 1rem;
-}
-
-nav ul li a {
-    color: #fff;
+    padding: 10px 20px;
+    background-color: #13b356; /* Couleur de fond du bouton */
+    color: #fff; /* Couleur du texte */
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-nav ul li a:hover {
-    background-color: #555;
+.navbar ul li a:hover {
+    background-color: #18920b;
 }
+
+.navbar ul li a:active {
+    background-color: #045e07; /* Nouvelle couleur de fond lorsque le bouton est cliqué */
+  }
 
 main {
     padding: 2rem;
