@@ -4,7 +4,7 @@ author: "Degives Nicolas"
 date: "Date"
 output:
   html_document:
-    code_folding: show
+    code_folding: hide
     collapsed: yes
     fig_caption: yes
     fig_height: 5
