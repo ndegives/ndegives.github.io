@@ -45,13 +45,21 @@ library(sf)
 library(pander)
 ```
 
+# Méthodologie
+
+Les traitements statistiques ont été réalisés avec le logiciel R (version 4.1.1). Par ailleurs, les opérations géostatistiques ont été réalisées à l’aide du package ‘gstat’ disponible sur R. Les transformations Box-Cox sont réalisée à l’aide de la librairie ‘AID’. Les graphes ont quant à été générés avec l’extension ‘ggplot’.
+
+# Traitement des données
+
+Les données utilisées ont été récoltées par plusieurs laboratoires en Wallonie.
+Le set que nous utilisons est un extrait de ce large jeu de données comprenant les concentrations trois éléments traces métalliques (ETM) pour une province Wallonne.  
+Plus précisément, il s’agit de concentrations en Plomb, Zinc et Cuivre récoltés à de multiples sites d'échantillonnage contenue dans la province de Liège.
+
 ```{r, echo=TRUE}
 mydata <- fread('data.csv')
 summary(mydata)
 head(mydata)
 ```
-
-# Analyse exploratoire des données
 
 ## Carte de la position des points de mesures des ETM et limite de la province étudiée.
 
@@ -72,8 +80,6 @@ mydataSpatial <- copy(grid)
 coordinates(mydataSpatial) <- ~X+Y
 proj4string(mydataSpatial) <- CRS("+init=epsg:31370") # Specify coordinate system (Lambert belge 1972)
 ```
-
-# Part 1
 
 ```{r, echo=TRUE}
 # Load provinces shapefile and specify it's coordinate system
@@ -105,7 +111,9 @@ ggplot()+
  scale_shape_manual("",values=15)
 ```
 
-## Pb sample
+## Nettoyage et visualisation des échantillons par ETM
+
+### Pb sample
 
 ```{r, echo=TRUE}
 Pb <- na.omit(subset(mydata,select=c("X","Y","Pb")))
@@ -118,7 +126,7 @@ ggplot() +
   ggtitle("Sample Pb")
 ```
 
-## Zn sample
+### Zn sample
 
 ```{r, echo=TRUE}
 Zn <- na.omit(subset(mydata,select=c("X","Y","Zn")))
@@ -133,7 +141,7 @@ ggplot() +
   ggtitle("Sample Zn")
 ```
 
-## Cu sample
+### Cu sample
 
 ```{r, echo=TRUE}
 Cu <- na.omit(subset(mydata,select=c("X","Y","Cu")))
@@ -148,7 +156,9 @@ ggplot() +
   ggtitle("Sample Cu")
 ```
 
-## Stat base for each ETM
+## Analyse exploratoire des données
+
+Le jeu de données des ETM ayant été l’objet d’un premier traitement, les statistiques de bases ont été calculées. 
 
 ```{r, echo=TRUE}
 mydata %>%
@@ -157,80 +167,30 @@ mydata %>%
   pander()
 ```
 
-# Correction de la distribution et diagnostic des outliers
-
-## Distribution de Pb,Zn et Cu
-
-### Pb 
-
 ```{r, echo=TRUE}
-ggplot(Pb, aes(x = Pb)) +
-  geom_histogram(aes(y = ..density.., 
-                     fill = "Density histogram" ),
-                 bins = 15, 
-                 color = "white") + 
-  geom_density(col = "lightsteelblue3", 
-               aes(fill = "Fitted pdf"), 
-               alpha = 0.2) +  
-  xlab("Pb") + 
-  ylab("f(x)") + 
-  ggtitle("Density histogram of the plomb") +
-  stat_function(fun=dnorm, 
-                args=list(mean = mean(Pb$Pb), sd = sd(Pb$Pb)),
-                aes(color="Normal pdf"),
-                size= 1) +
-  scale_fill_manual("", values = c("Density histogram"="lightsteelblue2",
-                                    "Fitted pdf"=alpha("lightsteelblue3",.2))) +
-  scale_color_manual("", values="red")
+chart.Correlation(mydata[,.(Zn,Pb,Cu)]) 
 ```
 
-### Zn
+Etant donné que les distributions observées des ETM ne s'apparente pas à des lois normales, il est nécessaire d'appliquer une transformation à chacune des trois distributions pour pouvoir utilisé les modèles.  
 
-```{r, echo=TRUE}
-ggplot(Zn, aes(x = Zn)) +
-  geom_histogram(aes(y = ..density.., 
-                     fill = "Density histogram" ),
-                 bins = 15, 
-                 color = "white") + 
-  geom_density(col = "lightsteelblue3", 
-               aes(fill = "Fitted pdf"), 
-               alpha = 0.2) +  
-  xlab("Zn") + 
-  ylab("f(x)") + 
-  ggtitle("Density histogram of the Zinc") +
-  stat_function(fun=dnorm, 
-                args=list(mean = mean(Zn$Zn), sd = sd(Zn$Zn)),
-                aes(color="Normal pdf"),
-                size= 1) + # width of the line
-  scale_fill_manual("", values = c("Density histogram"="lightsteelblue2",
-                                    "Fitted pdf"=alpha("lightsteelblue3",.2))) +
-  scale_color_manual("", values="red")
-```
+Une forte corrélation, soit la meilleure, entre le plomb et le zinc est observée, avec un coefficient de l’ordre de 0.73. Le Zinc est presqu’aussi bien corrélé au cuivre avec un coefficient de 0.73. Enfin, la corrélation entre le plomb et le cuivre est la plus faible, soit un coefficient de 0.59
 
-### Cu
+## Correction de la distribution et diagnostic des outliers
 
-```{r, echo=TRUE}
-ggplot(Cu, aes(x = Cu)) +
-  geom_histogram(aes(y = ..density.., 
-                     fill = "Density histogram" ),
-                 bins = 15, # number of bins
-                 color = "white") + 
-  geom_density(col = "lightsteelblue3", 
-               aes(fill = "Fitted pdf"), 
-               alpha = 0.2) +  
-  xlab("Cu") + 
-  ylab("f(x)") + 
-  ggtitle("Density histogram of the Cuivre") +
-  stat_function(fun=dnorm, 
-                args=list(mean = mean(Cu$Cu), sd = sd(Cu$Cu)),
-                aes(color="Normal pdf"),
-                size= 1) + # width of the line
-  scale_fill_manual("", values = c("Density histogram"="lightsteelblue2",
-                                    "Fitted pdf"=alpha("lightsteelblue3",.2))) +
-  scale_color_manual("", values="red")
-```
+Il est nécessaire, pour satisfaire aux hypothèses des modèles uitilisé pour les analyses et prédictions d’avoir des données suivant une distribution normale.
+La transformation Box-Cox a été utilisée afin de corriger la distribution des ETM lorsque celle-ci ne fut pas similaire à une distribution normale.
 
-## Correction des distribution (Boxcox)
+Pour une variable Z à valeurs non négatives, la transformée de Box-Cox est définit de la
+manière suivante :
+
+$$Y_i = \begin{cases}
+        \frac{Z^{\theta}_{i}-1}{\theta}, & \text{si } \theta \neq 0 \\
+        ln(Z_{i}), & \text{si } \theta = 0
+        \end{cases}$$
+
+Le paramètre θ est alors choisi pour que la variable transformée Yi s’approche au mieux d’une distribution normale.
+
+### Box-cox sur la distribution des échantillons de Plomb
 
 ```{r, echo=TRUE}
 # Plomb
@@ -238,10 +198,14 @@ BPb <- boxcoxnc(Pb$Pb, verbose = FALSE)
 Pb$Pbbx <- BPb$tf.data
 ```
 
+### Box-cox sur la distribution des échantillons de Zinc
+
 ```{r, echo=TRUE}
 BZn <- boxcoxnc(Zn$Zn, verbose = FALSE)
 Zn$Znbx <- BZn$tf.data
 ```
+
+### Box-cox sur la distribution des échantillons de Cuivre
 
 ```{r, echo=TRUE}
 BCu <- boxcoxnc(Cu$Cu, verbose = FALSE)
@@ -250,7 +214,27 @@ Cu$Cubx <- BCu$tf.data
 
 # Analyse et modélisation de la dépendence spatiale
 
-## Espérances et variogram Plomb (Pb)
+Afin de mesurer et modéliser la dépendance spatiale qu’il pourrait y avoir entre les valeurs d’un ETM, la fonction espérance et le variogramme sont utilisés.
+La fonction espérance permet dans un premier temps de rendre compte de la présence ou non de stationnarité d’ordre 1. 
+Dans la négative, l’espérance est donc fonction des coordonnées et le paramètre β alors être estimé à l’aide d’un modèle de régression linéaire (OLS, WLS et
+GLS).
+Le variogramme estime la dépendance dans l’espace en mesurant la dissimilitude des données en fonction de la distance h, avec :
+
+$$ \gamma(h)= \frac{1}{2} Var[Z(x+h) - Z(x)] \quad \forall x \in D
+  $$
+Où
+- Z est la variable spatiale étudiée
+- x est un vecteur de coordonnées
+- h est le vecteur de distance
+- D est le domaine géographique considéré
+
+On part de l'hypothèse (courramment faite) : hmax < \frac{max||h||}{2}
+
+La figure ci-dessous illustre le variogramme et les paramètres qu'il comporte.
+
+![variogramme](variogramme.png)
+
+## Espérances et variogramme Plomb (Pb)
 
 ### Espérence du Plomb B-C
 
@@ -280,7 +264,7 @@ cat("nombre d'outlier potentiel =", out)
 Pb <- Pb[Pbbx_res %between% c(res.Mean-3*res.Sd,res.Mean+3*res.Sd),]
 ```
 
-### Variogram résidu du Plomb Bx
+### Variogramme résidu du Plomb Bx
 
 ```{r, echo=TRUE}
 Pb.gstat <- gstat(formula=Pbbx_res~1, data=Pb,locations = ~X+Y)
@@ -294,7 +278,7 @@ trellis.unfocus()
 pander(fit.Pb)
 ```
 
-## Espérances et variogram Zinc (Zn)
+## Espérances et variogramme Zinc (Zn)
 
 ### Espérence du Zinc
 
@@ -324,7 +308,7 @@ cat("nombre d'outlier potentiel =", out)
 Zn <- Zn[Znbx_res %between% c(res.Mean-3*res.Sd,res.Mean+3*res.Sd),]
 ```
 
-### Variogram résidu du Zinc Bx
+### Variogramme résidu du Zinc Bx
 
 ```{r, echo=TRUE}
 Zn.gstat <- gstat(formula=Znbx_res~1, data=Zn,locations = ~X+Y)
@@ -340,7 +324,7 @@ trellis.unfocus()
 pander(fit.Zn)
 ```
 
-## Espérances et variogram Cuivre (Cu)
+## Espérances et variogramme Cuivre (Cu)
 
 ### Espérence du Cuivre
 
@@ -370,7 +354,7 @@ cat("nombre d'outlier potentiel =", out)
 Cu <- Cu[Cubx_res %between% c(res.Mean-3*res.Sd,res.Mean+3*res.Sd),]
 ```
 
-### Variogram résidu du Cuivre Bx
+### Variogramme résidu du Cuivre Bx
 
 ```{r, echo=TRUE}
 Cu.gstat <- gstat(formula=Cubx_res~1, data=Cu,locations = ~X+Y)
@@ -410,7 +394,15 @@ plot.predictions <- function(pred,data, plot.title,legend){
 }
 ```
 
-## Via une méthode déterministe au choix (distance inverse)
+## Prédiction par la méthode de distance inverse
+
+La prédiction par distance inverse est un prédicteur exact qui possède l’avantage de prendre en compte la distance entre le point prédit et les échantillons.
+On attribue ainsi à chaque points xi poids qui est proportionnel à l’inverse de la distance entre ce point et x0 ou l’on réalise la prédiction.
+Formellement, ce poids est donné par :
+
+$$\lambda_{i} = \frac{\frac{1}{||h_{0i}||^{\theta}}}{\sum^{n}_{j=1}\frac{1}{||h_{0j}||^{\theta}}} \quad avec : \theta > 0$$
+Le paramètre θ détermine donc la vitesse de diminution du poids d’un point en fonction de la distance ||h||.
+Ce paramètre est optimisé en minimisant la somme du carré des écarts lors de la leave-one-out cross validation (LOOCV).
 
 ### Plomb
 
