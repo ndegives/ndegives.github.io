@@ -61,6 +61,10 @@ summary(mydata)
 head(mydata)
 ```
 
+Le jeu de données contient 10 variables à savoir : un identifiant, des coordonnées (latitude et longitude), 3 éléments traces métalliques et 3 autres variables dont SIGLE-PEDO qui informe sur le type de sol.
+
+![Description du jeu de données](description data.png)
+
 ## Carte de la position des points de mesures des ETM et limite de la province étudiée.
 
 ```{r, echo=TRUE}
@@ -175,7 +179,7 @@ Etant donné que les distributions observées des ETM ne s'apparente pas à des 
 
 Une forte corrélation, soit la meilleure, entre le plomb et le zinc est observée, avec un coefficient de l’ordre de 0.73. Le Zinc est presqu’aussi bien corrélé au cuivre avec un coefficient de 0.73. Enfin, la corrélation entre le plomb et le cuivre est la plus faible, soit un coefficient de 0.59
 
-## Correction de la distribution et diagnostic des outliers
+## Correction de la distribution
 
 Il est nécessaire, pour satisfaire aux hypothèses des modèles uitilisé pour les analyses et prédictions d’avoir des données suivant une distribution normale.
 La transformation Box-Cox a été utilisée afin de corriger la distribution des ETM lorsque celle-ci ne fut pas similaire à une distribution normale.
@@ -373,8 +377,6 @@ pander(fit.Cu)
 
 Demande normalité, stationnarité d’ordre 1 et 2
 
-## Fonction plot.predictions
-
 ```{r, echo=TRUE}
 plot.predictions <- function(pred,data, plot.title,legend){
   ggplot() + 
@@ -396,7 +398,7 @@ plot.predictions <- function(pred,data, plot.title,legend){
 
 ## Prédiction par la méthode de distance inverse
 
-La prédiction par distance inverse est un prédicteur exact qui possède l’avantage de prendre en compte la distance entre le point prédit et les échantillons.
+La prédiction par distance inverse (Inverse distance weighting [IDW]) est un prédicteur exact qui possède l’avantage de prendre en compte la distance entre le point prédit et les échantillons.
 On attribue ainsi à chaque points xi poids qui est proportionnel à l’inverse de la distance entre ce point et x0 ou l’on réalise la prédiction.
 Formellement, ce poids est donné par :
 
@@ -524,6 +526,15 @@ plot.predictions(Cu.idw,Cu,"Concentration en Cuivre - Prediction Distance invers
 
 ## Via le krigeage
 
+Le Krigeage ou BLUP (Best Linear Unbiased Predictor) est une technique géostatistique de modélisation spatiale qui présente l’avantage de prendre en compte les distances entre les données et le point estimé et la structure spatiale (grâce au variogramme). 
+Ainsi, le krigeage se base sur une hypothèse d’autocorrélation spatiale des données en posant que deux données proches dans l’espace possèdent des caractéristiques similaires. 
+Le krigeage a basiquement un modèle similaire à la régression linéaire mais les erreurs y sont supposées dépendantes spatialement :
+
+$$Z(x) = \mu(x) + \delta(x) \quad \forall x \in D$$
+Où :
+- \mu est l'espérance de Z
+- \delta est une fonction aléatoire stationnaire
+
 ### Plomb
 
 ```{r, echo=TRUE}
@@ -568,7 +579,13 @@ Cu.krig[,predi := exp(log(alpha * pred + 1) / alpha)]
 plot.predictions(Cu.krig,Cu,"Concentration en Cuivre - Krigeage","Cu predictions")
 ```
 
-## via cokrigeage de Pb avec Zn
+## Via cokrigeage de Pb avec Zn
+
+Dans le cas ou deux champs aléatoires sont corrélés, le krigeage peut être précisé en combinant ces deux échantillons. La démarche est alors similaire à celle du Krigeage défini ci-dessus mais prend alors en compte une seconde variable pour la prédiction désirée. L’amélioration de la prédiction est d’autant plus importante lorsque :
+- Les variables sont fortement corrélées ;
+- La taille de la seconde variable est grande (par rapport à celle qu’on veut prédire) ;
+- Les positions échantillonnées de la seconde variable varient de ceux de la première.
+
 
 ```{r, echo=TRUE}
 g <- gstat(id="Pb", formula=Pbbx~1, data=Pb2, locations= ~X+Y)
@@ -594,6 +611,12 @@ Pb.cok[,predi := exp(log(alpha * pred + 1) / alpha)]
 plot.predictions(Pb.cok,Pb,'Concentration en Plomb - Cokrigeage','Prediction')
 ```
 
+## Simulation conditionnelles du plomb
+
+Dans le cas d’une simulation conditionnelle, on dispose et prend en compte les valeurs connues des échantillons.
+Les simulations sont alors basées sur le variogramme γ(||h||) et conditionnées par les concentrations connues par échantillonnages. 
+En réalisant plusieurs de ces simulations pour le Plomb, il sera possible de définir les zones possiblement contaminée dont la concentration dépasse un seuil fixé.
+Les zones qui dépassent ce seuil dans plus de x pourcent des simulations peuvent alors être suspectées d’être contaminées.
 
 ```{r, echo=TRUE}
 
