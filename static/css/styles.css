@@ -7,6 +7,8 @@ body, h1, h2, h3, p, ul, li {
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 header {
@@ -20,6 +22,7 @@ header {
 
 .header-left {
     text-align: left;
+    margin-left: 10px;
 }
 
 header h1 {
@@ -27,7 +30,11 @@ header h1 {
 }
 
 .navbar {
-    text-align: right;
+    display: flex;
+    flex-direction: row;
+    align-items: center ;
+    max-width: 1340px;
+    margin: auto;
 }
 
 .navbar ul {
@@ -69,6 +76,18 @@ section {
     margin-bottom: 2rem;
 }
 
+#projects a{
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #3dce2da4; /* Couleur de fond du bouton */
+    color: #fff; /* Couleur du texte */
+    text-decoration: none;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
 section h2 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
@@ -85,10 +104,3 @@ footer p {
     font-size: 0.8rem;
 }
 
-.nav{
-    display: flex;
-    flex-direction: row;
-    align-items: center ;
-    max-width: 1340px;
-    margin: auto;
-}
