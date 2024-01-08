@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio Nicolas Degives</title>
     <link rel="stylesheet" href="static/css/styles.css">
+    <script type="text/javascript" src="static/js/script.js"></script>
 </head>
 
 <body> 
     <header>
         <nav class="navbar">
-            <img src="static/image/profile.png" 
+            <img src="static/image/profile.PNG" 
             width="100" 
             height="100" />
             <div class="header-left">
@@ -31,7 +32,8 @@
 
         <section id="about">
             <h2>About me</h2>
-            <p> After my secondary education in sciences at Collège du Christ-Roi, I did my master's degree in bioengineering in agronomic sciences with a specialization in data science at UCLouvain.
+            <p> 
+                After my secondary education in sciences at Collège du Christ-Roi, I did my master's degree in bioengineering in agronomic sciences with a specialization in data science at UCLouvain.
                 I developed a particular interest in the data-driven approach. 
                 I'm convinced that data provides the best insight into problems and that using it can identify the best ways to improve many areas.
                 I'm motivated by the prospect of working with data and improving my skills by getting involved in innovative projects.
@@ -41,24 +43,38 @@
 
         <section id="projects">
             <h2>My projects</h2>
-            <ul>
-                <li>
-                    <a href="templates/project/malaria/malaria.html" target="_blank">  Modeling the spread of malaria and possible responses </a>
-                    <p>This project aims to develop a model for the spread of malaria using the SEIR (Susceptible-Exposed-Infectious-Removed) model, a widely recognized approach for studying the dynamics of infectious diseases. Malaria, a parasitic disease transmitted by mosquitoes, continues to pose a significant public health challenge in many regions of the world. </p>
-                    <p>The primary objective of this project is to build a sophisticated mathematical model that will provide a better understanding of malaria transmission dynamics, taking into account factors such as population density, seasonality, the use of insecticide-treated bed nets, and other key variables. The SEIR model will be employed to represent the various phases of the disease, from the incubation period to infection and recovery.</p>
-                    <p>Real epidemiological data will be collected and used to calibrate and validate the model, enabling more accurate forecasts of malaria spread in different geographic areas. Furthermore, this model will assist in assessing the potential impact of various public health interventions, such as bed net distribution, insecticide spraying, and the promotion of prevention behaviors.</p>
-                    <p>This project on modeling malaria spread with an SEIR model aims to provide critical insights to guide malaria control strategies and contribute to reducing the prevalence of this devastating disease in affected regions.</p>
-                </li>
-                <li>
-                    <a href="templates/project/mod_spatiale/mod_spatiale.html" target="_blank">  Mapping concentrations of three trace metals in the province of Liège (Belgium) </a>
-                    <p>This project aims to create a detailed map of trace metal element (TME) concentrations in the Province of Liège, Belgium. TMEs, such as lead, mercury, cadmium, and other metals, can have a significant impact on the environment and human health, especially when present at elevated levels.</p>
-                    <p>The primary goal of this initiative is to gather precise geospatial data on TME concentrations throughout the province using chemical analysis, geomatics, and mapping techniques. These data could then be integrated into a Geographic Information System (GIS) to create interactive and informative maps.</p>
-                    <p>The resulting maps could, for example, enable local authorities, researchers, public health professionals, and the community at large to better understand the spatial distribution of TMEs in the Province of Liège. This will help identify potentially at-risk areas and guide remediation and prevention efforts.</p>
-                    <p>Additionally, this project will aim to raise public awareness about the issues related to TME contamination by providing accessible information to the general public, including through online applications and awareness campaigns.</p>
-                    <p>In summary, this project to map trace metal element concentrations in the Province of Liège will contribute to more effective environmental risk management and public health protection while promoting responsible use of the region's natural resources.</p>
-                </li>
-                    <!-- Ajoutez d'autres projets ici -->
-            </ul>
+            <div class="project">
+                <a href="templates/project/malaria/malaria.html" target="_blank">  Modeling the spread of malaria and possible responses </a>
+                    <p>
+                        This project aims to develop a model for the spread of malaria using the SEIR (Susceptible-Exposed-Infectious-Removed) model, a widely recognized approach for studying the dynamics of infectious diseases. Malaria, a parasitic disease transmitted by mosquitoes, continues to pose a significant public health challenge in many regions of the world. </p>
+                
+                <div class="hidden-description" id="malaria">
+                    <p>     
+                            The primary objective of this project is to build a sophisticated mathematical model that will provide a better understanding of malaria transmission dynamics, taking into account factors such as population density, seasonality, the use of insecticide-treated bed nets, and other key variables. The SEIR model will be employed to represent the various phases of the disease, from the incubation period to infection and recovery.
+                            Real epidemiological data will be collected and used to calibrate and validate the model, enabling more accurate forecasts of malaria spread in different geographic areas. Furthermore, this model will assist in assessing the potential impact of various public health interventions, such as bed net distribution, insecticide spraying, and the promotion of prevention behaviors.
+                            This project on modeling malaria spread with an SEIR model aims to provide critical insights to guide malaria control strategies and contribute to reducing the prevalence of this devastating disease in affected regions. 
+                    </p>
+                </div>
+                <button class="read-more-btn" id="malaria_btn" onclick="toggleDescription('malaria')">Lire plus</button>
+            </div>
+
+             <div class="project">
+                <a href="templates/project/mod_spatiale/mod_spatiale.html" target="_blank">  Mapping concentrations of three trace metals in the province of Liège (Belgium) </a>
+                    <p> 
+                        This project aims to create a detailed map of trace metal element (TME) concentrations in the Province of Liège, Belgium. TMEs, such as lead, mercury, cadmium, and other metals, can have a significant impact on the environment and human health, especially when present at elevated levels.
+                    </p>
+                
+                <div class="hidden-description" id="mod_spatial">
+                    <p>
+                        The primary goal of this initiative is to gather precise geospatial data on TME concentrations throughout the province using chemical analysis, geomatics, and mapping techniques. These data could then be integrated into a Geographic Information System (GIS) to create interactive and informative maps.
+                        The resulting maps could, for example, enable local authorities, researchers, public health professionals, and the community at large to better understand the spatial distribution of TMEs in the Province of Liège. This will help identify potentially at-risk areas and guide remediation and prevention efforts.
+                        Additionally, this project will aim to raise public awareness about the issues related to TME contamination by providing accessible information to the general public, including through online applications and awareness campaigns.
+                        In summary, this project to map trace metal element concentrations in the Province of Liège will contribute to more effective environmental risk management and public health protection while promoting responsible use of the region's natural resources.
+                    </p>
+                </div>
+                <button class="read-more-btn" onclick="toggleDescription('mod_spatial')">Lire plus</button>
+            </div>
+
         </section>
 
         <section id="contact">
