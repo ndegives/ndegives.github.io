@@ -6,7 +6,6 @@ body, h1, h2, h3, p, ul, li {
 
 body {
     font-family: Arial, sans-serif;
-    line-height: 1.6;
     text-align: justify;
     text-justify: inter-word;
 }
@@ -78,7 +77,6 @@ section {
 
 .project h2{
     display: flex;
-    padding: 5px 10px;
     background-color: #3dce2da4; /* Couleur de fond du bouton */
     color: #fff; /* Couleur du texte */
     text-decoration: none;
@@ -87,12 +85,13 @@ section {
     font-size: 16px;
     font-weight: bold;
     align-items:center;
+    justify-content: space-between;
 }
 
-#projects img {
+.project h2 a img {
     height:30px;
     cursor: pointer;
-    margin : 0px 20px;
+    margin-left: auto;
 }
 
 .project {
